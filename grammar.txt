@@ -36,9 +36,9 @@
 
 	funcname ::= Name {"." Name} [":" Name]
 
-	varlist ::= var {"," var}
+	varlist ::= variable {"," variable}
 
-	var ::=  Name | prefixexp "[" exp "]" | prefixexp "." Name
+	variable ::=  Name | prefixexp "[" exp "]" | prefixexp "." Name
 
 	namelist ::= Name {"," Name}
 
@@ -47,7 +47,7 @@
 	exp ::=  nil | false | true | Numeral | LiteralString | "..." | functiondef |
 		 prefixexp | tableconstructor | exp binop exp | unop exp
 
-	prefixexp ::= var | functioncall | "(" exp ")"
+	prefixexp ::= variable | functioncall | "(" exp ")"
 
 	functioncall ::=  prefixexp args | prefixexp ":" Name args
 

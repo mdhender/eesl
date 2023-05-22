@@ -21,32 +21,34 @@
 
 package eesl
 
-func or(args ...func() bool) bool {
+func or(args ...func([]Token) bool) bool {
+	var tokens []Token
 	for _, arg := range args {
-		if arg() {
+		if arg(tokens) {
 			return true
 		}
 	}
 	return false
 }
 
-func sequence(args ...func() bool) bool {
+func sequence(args ...func([]Token) bool) bool {
+	var tokens []Token
 	for _, arg := range args {
-		if !arg() {
+		if !arg(tokens) {
 			return false
 		}
 	}
 	return true
 }
 
-func zeroOrMore(args ...any) func() bool {
-	return func() bool {
+func zeroOrMore(args ...any) func([]Token) bool {
+	return func(tokens []Token) bool {
 		return true
 	}
 }
 
-func zeroOrOne(args ...any) func() bool {
-	return func() bool {
+func zeroOrOne(args ...any) func([]Token) bool {
+	return func(tokens []Token) bool {
 		return true
 	}
 }

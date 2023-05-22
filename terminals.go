@@ -21,61 +21,77 @@
 
 package eesl
 
-func Ampersand() bool              { return true }
-func And() bool                    { return true }
-func Bar() bool                    { return true }
-func Break() bool                  { return true }
-func Caret() bool                  { return true }
-func CloseBracket() bool           { return true }
-func CloseCurly() bool             { return true }
-func CloseParen() bool             { return true }
-func Colon() bool                  { return true }
-func ColonColon() bool             { return true }
-func Comma() bool                  { return true }
-func Do() bool                     { return true }
-func Dot() bool                    { return true }
-func DotDot() bool                 { return true }
-func DotDotDot() bool              { return true }
-func Else() bool                   { return true }
-func ElseIf() bool                 { return true }
-func End() bool                    { return true }
-func Equals() bool                 { return true }
-func EqualsEquals() bool           { return true }
-func False() bool                  { return true }
-func For() bool                    { return true }
-func Function() bool               { return true }
-func Goto() bool                   { return true }
-func GreaterThan() bool            { return true }
-func GreaterThanEquals() bool      { return true }
-func GreaterThanGreaterThan() bool { return true }
-func Hash() bool                   { return true }
-func Hyphen() bool                 { return true }
-func If() bool                     { return true }
-func In() bool                     { return true }
-func LessThan() bool               { return true }
-func LessThanEquals() bool         { return true }
-func LessThanLessThan() bool       { return true }
-func LiteralString() bool          { return true }
-func Local() bool                  { return true }
-func Name() bool                   { return true }
-func Nil() bool                    { return true }
-func Not() bool                    { return true }
-func Numeral() bool                { return true }
-func OpenBracket() bool            { return true }
-func OpenCurly() bool              { return true }
-func OpenParen() bool              { return true }
-func Or() bool                     { return true }
-func Percent() bool                { return true }
-func Plus() bool                   { return true }
-func Repeat() bool                 { return true }
-func Return() bool                 { return true }
-func SemiColon() bool              { return true }
-func Slash() bool                  { return true }
-func SlashSlash() bool             { return true }
-func Star() bool                   { return true }
-func Then() bool                   { return true }
-func Tilde() bool                  { return true }
-func TildeEquals() bool            { return true }
-func True() bool                   { return true }
-func Until() bool                  { return true }
-func While() bool                  { return true }
+import "bytes"
+
+func Ampersand(tokens []Token) bool    { return bytes.Equal(tokens[0].Text, []byte{'&'}) }
+func And(tokens []Token) bool          { return bytes.Equal(tokens[0].Text, []byte{'a', 'n', 'd'}) }
+func Bar(tokens []Token) bool          { return bytes.Equal(tokens[0].Text, []byte{'|'}) }
+func Break(tokens []Token) bool        { return bytes.Equal(tokens[0].Text, []byte{'b', 'r', 'e', 'a', 'k'}) }
+func Caret(tokens []Token) bool        { return bytes.Equal(tokens[0].Text, []byte{'^'}) }
+func CloseBracket(tokens []Token) bool { return bytes.Equal(tokens[0].Text, []byte{']'}) }
+func CloseCurly(tokens []Token) bool   { return bytes.Equal(tokens[0].Text, []byte{'}'}) }
+func CloseParen(tokens []Token) bool   { return bytes.Equal(tokens[0].Text, []byte{')'}) }
+func Colon(tokens []Token) bool        { return bytes.Equal(tokens[0].Text, []byte{':'}) }
+func ColonColon(tokens []Token) bool   { return bytes.Equal(tokens[0].Text, []byte{':', ':'}) }
+func Comma(tokens []Token) bool        { return bytes.Equal(tokens[0].Text, []byte{','}) }
+func Do(tokens []Token) bool           { return bytes.Equal(tokens[0].Text, []byte{'d', 'o'}) }
+func Dot(tokens []Token) bool          { return bytes.Equal(tokens[0].Text, []byte{'.'}) }
+func DotDot(tokens []Token) bool       { return bytes.Equal(tokens[0].Text, []byte{'.', '.'}) }
+func DotDotDot(tokens []Token) bool    { return bytes.Equal(tokens[0].Text, []byte{'.', '.', '.'}) }
+func Else(tokens []Token) bool         { return bytes.Equal(tokens[0].Text, []byte{'e', 'l', 's', 'e'}) }
+func ElseIf(tokens []Token) bool {
+	return bytes.Equal(tokens[0].Text, []byte{'e', 'l', 's', 'e', 'i', 'f'})
+}
+func End(tokens []Token) bool          { return bytes.Equal(tokens[0].Text, []byte{'e', 'n', 'd'}) }
+func Equals(tokens []Token) bool       { return bytes.Equal(tokens[0].Text, []byte{'='}) }
+func EqualsEquals(tokens []Token) bool { return bytes.Equal(tokens[0].Text, []byte{'=', '='}) }
+func False(tokens []Token) bool        { return bytes.Equal(tokens[0].Text, []byte{'f', 'a', 'l', 's', 'e'}) }
+func For(tokens []Token) bool          { return bytes.Equal(tokens[0].Text, []byte{'f', 'o', 'r'}) }
+func Function(tokens []Token) bool {
+	return bytes.Equal(tokens[0].Text, []byte{'f', 'u', 'n', 'c', 't', 'i', 'o', 'n'})
+}
+func Goto(tokens []Token) bool              { return bytes.Equal(tokens[0].Text, []byte{'g', 'o', 't', 'o'}) }
+func GreaterThan(tokens []Token) bool       { return bytes.Equal(tokens[0].Text, []byte{'>'}) }
+func GreaterThanEquals(tokens []Token) bool { return bytes.Equal(tokens[0].Text, []byte{'>', '='}) }
+func GreaterThanGreaterThan(tokens []Token) bool {
+	return bytes.Equal(tokens[0].Text, []byte{'>', '>'})
+}
+func Hash(tokens []Token) bool             { return bytes.Equal(tokens[0].Text, []byte{'#'}) }
+func Hyphen(tokens []Token) bool           { return bytes.Equal(tokens[0].Text, []byte{'-'}) }
+func If(tokens []Token) bool               { return bytes.Equal(tokens[0].Text, []byte{'i', 'f'}) }
+func In(tokens []Token) bool               { return bytes.Equal(tokens[0].Text, []byte{'i', 'n'}) }
+func LessThan(tokens []Token) bool         { return bytes.Equal(tokens[0].Text, []byte{'<'}) }
+func LessThanEquals(tokens []Token) bool   { return bytes.Equal(tokens[0].Text, []byte{'<', '='}) }
+func LessThanLessThan(tokens []Token) bool { return bytes.Equal(tokens[0].Text, []byte{'<', '<'}) }
+func LiteralString(tokens []Token) bool {
+	return bytes.Equal(tokens[0].Text, []byte{'"', '.', '.', '.', '"'})
+}
+func Local(tokens []Token) bool { return bytes.Equal(tokens[0].Text, []byte{'l', 'o', 'c', 'a', 'l'}) }
+func Name(tokens []Token) bool  { return bytes.Equal(tokens[0].Text, []byte{'n', 'a', 'm', 'e'}) }
+func Nil(tokens []Token) bool   { return bytes.Equal(tokens[0].Text, []byte{'n', 'i', 'l'}) }
+func Not(tokens []Token) bool   { return bytes.Equal(tokens[0].Text, []byte{'n', 'o', 't'}) }
+func Numeral(tokens []Token) bool {
+	return bytes.Equal(tokens[0].Text, []byte{'0', '.', '.', '.', '9'})
+}
+func OpenBracket(tokens []Token) bool { return bytes.Equal(tokens[0].Text, []byte{'['}) }
+func OpenCurly(tokens []Token) bool   { return bytes.Equal(tokens[0].Text, []byte{'{'}) }
+func OpenParen(tokens []Token) bool   { return bytes.Equal(tokens[0].Text, []byte{'('}) }
+func Or(tokens []Token) bool          { return bytes.Equal(tokens[0].Text, []byte{'o', 'r'}) }
+func Percent(tokens []Token) bool     { return bytes.Equal(tokens[0].Text, []byte{'%'}) }
+func Plus(tokens []Token) bool        { return bytes.Equal(tokens[0].Text, []byte{'+'}) }
+func Repeat(tokens []Token) bool {
+	return bytes.Equal(tokens[0].Text, []byte{'r', 'e', 'p', 'e', 'a', 't'})
+}
+func Return(tokens []Token) bool {
+	return bytes.Equal(tokens[0].Text, []byte{'r', 'e', 't', 'u', 'r', 'n'})
+}
+func SemiColon(tokens []Token) bool   { return bytes.Equal(tokens[0].Text, []byte{';'}) }
+func Slash(tokens []Token) bool       { return bytes.Equal(tokens[0].Text, []byte{'/'}) }
+func SlashSlash(tokens []Token) bool  { return bytes.Equal(tokens[0].Text, []byte{'/', '/'}) }
+func Star(tokens []Token) bool        { return bytes.Equal(tokens[0].Text, []byte{'*'}) }
+func Then(tokens []Token) bool        { return bytes.Equal(tokens[0].Text, []byte{'t', 'h', 'e', 'n'}) }
+func Tilde(tokens []Token) bool       { return bytes.Equal(tokens[0].Text, []byte{'~'}) }
+func TildeEquals(tokens []Token) bool { return bytes.Equal(tokens[0].Text, []byte{'~', '='}) }
+func True(tokens []Token) bool        { return bytes.Equal(tokens[0].Text, []byte{'t', 'r', 'u', 'e'}) }
+func Until(tokens []Token) bool       { return bytes.Equal(tokens[0].Text, []byte{'u', 'n', 't', 'i', 'l'}) }
+func While(tokens []Token) bool       { return bytes.Equal(tokens[0].Text, []byte{'w', 'h', 'i', 'l', 'e'}) }

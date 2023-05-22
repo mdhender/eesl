@@ -21,28 +21,28 @@
 
 package eesl
 
-func chunk() bool {
-	return block()
+func chunk(tokens []Token) bool {
+	return block(tokens)
 }
 
-func block() bool {
+func block(tokens []Token) bool {
 	return sequence(zeroOrMore(stat), zeroOrOne(retstat))
 }
 
-func stat() bool {
-	if SemiColon() {
+func stat(tokens []Token) bool {
+	if SemiColon(tokens) {
 		return true
 	}
 	if sequence(varlist, Equals, explist) {
 		return true
 	}
-	if functioncall() {
+	if functioncall(tokens) {
 		return true
 	}
-	if label() {
+	if label(tokens) {
 		return true
 	}
-	if Break() {
+	if Break(tokens) {
 		return true
 	}
 	if sequence(Goto, Name) {
@@ -75,32 +75,32 @@ func stat() bool {
 	return sequence(Local, attnamelist, zeroOrOne(Equals, explist))
 }
 
-func attnamelist() bool {
+func attnamelist(tokens []Token) bool {
 	return sequence(Name, attrib, zeroOrOne(Comma, Name, attrib))
 }
 
-func attrib() bool {
-	return zeroOrOne(LessThan, Name, GreaterThan)()
+func attrib(tokens []Token) bool {
+	return zeroOrOne(LessThan, Name, GreaterThan)(tokens)
 }
 
-func retstat() bool {
+func retstat(tokens []Token) bool {
 	return sequence(Return, zeroOrOne(explist), zeroOrOne(SemiColon))
 }
 
-func label() bool {
+func label(tokens []Token) bool {
 	return sequence(ColonColon, Name, ColonColon)
 }
 
-func funcname() bool {
+func funcname(tokens []Token) bool {
 	return sequence(Name, zeroOrMore(Dot, Name), zeroOrOne(Colon, Name))
 }
 
-func varlist() bool {
-	return sequence(var_, zeroOrMore(Comma, var_))
+func varlist(tokens []Token) bool {
+	return sequence(variable, zeroOrMore(Comma, variable))
 }
 
-func var_() bool {
-	if Name() {
+func variable(tokens []Token) bool {
+	if Name(tokens) {
 		return true
 	}
 	if sequence(prefixexp, OpenBracket, exp, CloseBracket) {
@@ -109,40 +109,40 @@ func var_() bool {
 	return sequence(prefixexp, Dot, Name)
 }
 
-func namelist() bool {
+func namelist(tokens []Token) bool {
 	return sequence(Name, zeroOrMore(Comma, Name))
 }
 
-func explist() bool {
+func explist(tokens []Token) bool {
 	return sequence(exp, zeroOrMore(Comma, Name))
 }
 
-func exp() bool {
-	if Nil() {
+func exp(tokens []Token) bool {
+	if Nil(tokens) {
 		return true
 	}
-	if False() {
+	if False(tokens) {
 		return true
 	}
-	if True() {
+	if True(tokens) {
 		return true
 	}
-	if Numeral() {
+	if Numeral(tokens) {
 		return true
 	}
-	if LiteralString() {
+	if LiteralString(tokens) {
 		return true
 	}
-	if DotDotDot() {
+	if DotDotDot(tokens) {
 		return true
 	}
-	if functiondef() {
+	if functiondef(tokens) {
 		return true
 	}
-	if prefixexp() {
+	if prefixexp(tokens) {
 		return true
 	}
-	if tableconstructor() {
+	if tableconstructor(tokens) {
 		return true
 	}
 	if sequence(exp, binop, exp) {
@@ -151,74 +151,74 @@ func exp() bool {
 	return sequence(unop, exp)
 }
 
-func prefixexp() bool {
-	if var_() {
+func prefixexp(tokens []Token) bool {
+	if variable(tokens) {
 		return true
 	}
-	if functioncall() {
+	if functioncall(tokens) {
 		return true
 	}
 	return sequence(OpenParen, exp, CloseParen)
 }
 
-func functioncall() bool {
+func functioncall(tokens []Token) bool {
 	if sequence(prefixexp, args) {
 		return true
 	}
 	return sequence(prefixexp, Colon, Name, args)
 }
 
-func args() bool {
+func args(tokens []Token) bool {
 	if sequence(OpenParen, zeroOrOne(explist), CloseParen) {
 		return true
 	}
-	if tableconstructor() {
+	if tableconstructor(tokens) {
 		return true
 	}
-	return LiteralString()
+	return LiteralString(tokens)
 }
 
-func functiondef() bool {
+func functiondef(tokens []Token) bool {
 	return sequence(Function, funcbody)
 }
 
-func funcbody() bool {
+func funcbody(tokens []Token) bool {
 	return sequence(OpenParen, zeroOrOne(parlist), CloseParen, block, End)
 }
 
-func parlist() bool {
+func parlist(tokens []Token) bool {
 	if sequence(namelist, zeroOrOne(Comma, DotDotDot)) {
 		return true
 	}
-	return DotDotDot()
+	return DotDotDot(tokens)
 }
 
-func tableconstructor() bool {
+func tableconstructor(tokens []Token) bool {
 	return sequence(OpenCurly, zeroOrOne(fieldlist), CloseCurly)
 }
 
-func fieldlist() bool {
+func fieldlist(tokens []Token) bool {
 	return sequence(field, zeroOrMore(fieldsep, field), zeroOrOne(fieldsep))
 }
 
-func field() bool {
+func field(tokens []Token) bool {
 	if sequence(OpenBracket, exp, CloseBracket, Equals, exp) {
 		return true
 	}
 	if sequence(Name, Equals, exp) {
 		return true
 	}
-	return exp()
+	return exp(tokens)
 }
 
-func fieldsep() bool {
+func fieldsep(tokens []Token) bool {
 	return or(Comma, SemiColon)
 }
 
-func binop() bool {
+func binop(tokens []Token) bool {
 	return or(Plus, Hyphen, Star, Slash, SlashSlash, Caret, Percent, Ampersand, Tilde, Bar, GreaterThanGreaterThan, LessThanLessThan, DotDot, LessThan, LessThanEquals, GreaterThan, GreaterThanEquals, EqualsEquals, TildeEquals, And, Or)
 }
 
-func unop() bool {
+func unop(tokens []Token) bool {
 	return or(Hyphen, Not, Hash, Tilde)
 }
