@@ -27,12 +27,16 @@ import (
 	"unicode/utf8"
 )
 
+// Token is the tuple returned from the scanner.
 type Token struct {
 	Line  int
 	Text  []byte
 	Error error
 }
 
+// Scan returns all the tokens in the input buffer.
+// Errors such as unterminated blocks are included in the token.
+// Nil is returned only if the input buffer is empty.
 func Scan(buffer []byte) []Token {
 	var delims = []byte{'+', '-', '*', '/', '%', '^', '#', ',', '=', '<', '>', '(', ')', '[', ']', '{', '}', '.', ':', ';'}
 
@@ -58,7 +62,7 @@ func Scan(buffer []byte) []Token {
 				if eoc == -1 {
 					// error, unterminated block comment
 					t.Text, buffer = buffer, nil
-					t.Error = ErrUnterminatedComment
+					t.Error = ErrUnterminated
 				} else {
 					t.Text, buffer = buffer[:eoc+4], buffer[eoc+4:]
 				}
@@ -120,7 +124,7 @@ func Scan(buffer []byte) []Token {
 			}
 			if len(buffer) == 0 || buffer[0] != qm {
 				// unterminated quoted text
-				t.Error = ErrUnterminatedQuote
+				t.Error = ErrUnterminated
 				buffer = nil
 			} else {
 				buffer, length = buffer[1:], length+1
@@ -142,9 +146,6 @@ func Scan(buffer []byte) []Token {
 		t.Text = start[:length]
 		tokens = append(tokens, t)
 	}
-
-	// add an end of input token
-	tokens = append(tokens, Token{Line: line})
 
 	return tokens
 }

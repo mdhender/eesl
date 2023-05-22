@@ -24,6 +24,5 @@ package eesl
 import "github.com/maloquacious/cerrors"
 
 const (
-	ErrUnterminatedComment = cerrors.Error("unterminated comment block")
-	ErrUnterminatedQuote   = cerrors.Error("unterminated quoted text")
+	ErrUnterminated = cerrors.Error("unterminated")
 )

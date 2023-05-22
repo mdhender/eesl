@@ -27,78 +27,82 @@ import (
 )
 
 func TestScanner(t *testing.T) {
-	//input := []byte(`
-	//	-- defines a factorial function
-	//	function fact (n)
-	//	  if n == 0 then
-	//		return 1
-	//	  else
-	//		return n * fact(n-1)
-	//	  end
-	//	end
-	//
-	//	print("enter a number:")
-	//	a = io.read("*number")        -- read a number
-	//	print(fact(a))
-	//`)
-	//
-	//for _, token := range eesl.Scan(input) {
-	//	t.Errorf("%3d: %-30q %v\n", token.Line, string(token.Text), token.Error)
-	//}
-	//
-	//input = []byte(`
-	//	-- file 'lib1.lua'
-	//
-	//	function norm (x, y)
-	//	  local n2 = x^2 + y^2
-	//	  return math.sqrt(n2)
-	//	end
-	//
-	//	function twice (x)
-	//	  return 2*x
-	//	end
-	//`)
-	//
-	//for _, token := range eesl.Scan(input) {
-	//	t.Errorf("%3d: %-30q %v\n", token.Line, string(token.Text), token.Error)
-	//}
-	//
-	//input = []byte(`
-	//	--[[
-	//	print(10)         -- no action (comment)
-	//	--]]
-	//
-	//	---[[
-	//	print(10)         -- no action (comment)
-	//	--]]
-	//`)
-	//
-	//for _, token := range eesl.Scan(input) {
-	//	t.Errorf("%3d: %-30q %v\n", token.Line, string(token.Text), token.Error)
-	//}
-	//
-	//input = []byte(`
-	//	print(type("Hello world"))  --> string
-	//	print(type(10.4*3))         --> number
-	//	print(type(print))          --> function
-	//	print(type(type))           --> function
-	//	print(type(true))           --> boolean
-	//	print(type(nil))            --> nil
-	//	print(type(type(X)))        --> string
-	//	print(type(a))              --> nil   (a is not initialized)
-	//	a = print                   -- yes, this is valid!
-	//	print(type(a))              --> number
-	//`)
-	//
-	//for _, token := range eesl.Scan(input) {
-	//	t.Errorf("%3d: %-30q %v\n", token.Line, string(token.Text), token.Error)
-	//}
-	//
-	//input = []byte(`
-	//	print("one line\nnext line\n\"in quotes\", 'in quotes'")
-	//	print('a backslash inside quotes: \'\\\'')
-	//	print("a simpler way: '\\'")
-	//`)
+	input := []byte(`
+		-- defines a factorial function
+		function fact (n)
+		  if n == 0 then
+			return 1
+		  else
+			return n * fact(n-1)
+		  end
+		end
+	
+		print("enter a number:")
+		a = io.read("*number")        -- read a number
+		print(fact(a))
+	`)
+
+	for _, token := range eesl.Scan(input) {
+		t.Logf("%3d: %-30q %v\n", token.Line, string(token.Text), token.Error)
+	}
+
+	input = []byte(`
+		-- file 'lib1.lua'
+	
+		function norm (x, y)
+		  local n2 = x^2 + y^2
+		  return math.sqrt(n2)
+		end
+	
+		function twice (x)
+		  return 2*x
+		end
+	`)
+
+	for _, token := range eesl.Scan(input) {
+		t.Logf("%3d: %-30q %v\n", token.Line, string(token.Text), token.Error)
+	}
+
+	input = []byte(`
+		--[[
+		print(10)         -- no action (comment)
+		--]]
+	
+		---[[
+		print(10)         -- no action (comment)
+		--]]
+	`)
+
+	for _, token := range eesl.Scan(input) {
+		t.Logf("%3d: %-30q %v\n", token.Line, string(token.Text), token.Error)
+	}
+
+	input = []byte(`
+		print(type("Hello world"))  --> string
+		print(type(10.4*3))         --> number
+		print(type(print))          --> function
+		print(type(type))           --> function
+		print(type(true))           --> boolean
+		print(type(nil))            --> nil
+		print(type(type(X)))        --> string
+		print(type(a))              --> nil   (a is not initialized)
+		a = print                   -- yes, this is valid!
+		print(type(a))              --> number
+	`)
+
+	for _, token := range eesl.Scan(input) {
+		t.Logf("%3d: %-30q %v\n", token.Line, string(token.Text), token.Error)
+	}
+
+	input = []byte(`
+		print("one line\nnext line\n\"in quotes\", 'in quotes'")
+		print('a backslash inside quotes: \'\\\'')
+		print("a simpler way: '\\'")
+	`)
+
+	for _, token := range eesl.Scan(input) {
+		t.Logf("%3d: %-30q %v\n", token.Line, string(token.Text), token.Error)
+	}
 
 	type expect struct {
 		line int
@@ -111,19 +115,15 @@ func TestScanner(t *testing.T) {
 	}{
 		{1, `"a"`, []expect{
 			{1, `"a"`},
-			{1, ""},
 		}},
 		{2, `'a'`, []expect{
 			{1, `'a'`},
-			{1, ""},
 		}},
 		{3, `"a\nb \"c\"\n'in quotes'"`, []expect{
 			{1, `"a\nb \"c\"\n'in quotes'"`},
-			{1, ""},
 		}},
 		{4, `'a\nb \'c\'\n"in quotes"'`, []expect{
 			{1, `'a\nb \'c\'\n"in quotes"'`},
-			{1, ""},
 		}},
 		{5, `print(type("Hello world"))`, []expect{
 			{1, "print"},
@@ -133,7 +133,6 @@ func TestScanner(t *testing.T) {
 			{1, "\"Hello world\""},
 			{1, ")"},
 			{1, ")"},
-			{1, ""},
 		}},
 	} {
 		tokens := eesl.Scan([]byte(tc.input))
