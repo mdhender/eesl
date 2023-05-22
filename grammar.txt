@@ -1,93 +1,77 @@
-;; Copied from [Lua 5.1 Reference Manual](http://parrot.github.io/parrot-docs0/0.4.7/html/languages/lua/doc/lua51.bnf.html)
+;; Copied from https://www.lua.org/manual/5.4/manual.html#9
+;;
+;; 9 – The Complete Syntax of Lua
+;;     Here is the complete syntax of Lua in extended BNF. As usual in
+;;     extended BNF, {A} means 0 or more A's, and [A] means an optional
+;;     A. (For operator precedences, see §3.4.8; for a description of
+;;     the terminals Name, Numeral, and LiteralString, see §3.1.)
 
-chunk ::= {stat [`;´]} [laststat[`;´]] .
+	chunk ::= block
 
-block ::= chunk .
+	block ::= {stat} [retstat]
 
-stat ::= varlist1 `=´ explist1
-       | functioncall
-       | do block end
-       | while exp do block end
-       | repeat block until exp
-       | if exp then block {elseif exp then block} [else block] end
-       | for Name `=´ exp `,´ exp [`,´ exp] do block end
-       | for namelist in explist1 do block end
-       | function funcname funcbody
-       | local function Name funcbody
-       | local namelist [`=´ explist1] .
+	stat ::=  ";" |
+		 varlist "=" explist |
+		 functioncall |
+		 label |
+		 break |
+		 goto Name |
+		 do block end |
+		 while exp do block end |
+		 repeat block until exp |
+		 if exp then block {elseif exp then block} [else block] end |
+		 for Name "=" exp "," exp ["," exp] do block end |
+		 for namelist in explist do block end |
+		 function funcname funcbody |
+		 local function Name funcbody |
+		 local attnamelist ["=" explist]
 
-laststat ::= return [explist1]
-           | break .
+	attnamelist ::=  Name attrib {"," Name attrib}
 
-funcname ::= Name {`.´ Name} [`:´ Name] .
+	attrib ::= ["<" Name ">"]
 
-varlist1 ::= var {`,´ var} .
+	retstat ::= return [explist] [";"]
 
-var ::= Name
-      | prefixexp `[´ exp `]´
-      | prefixexp `.´ Name .
+	label ::= "::" Name "::"
 
-namelist ::= Name {`,´ Name} .
+	funcname ::= Name {"." Name} [":" Name]
 
-explist1 ::= {exp `,´} exp .
+	varlist ::= var {"," var}
 
-exp ::= nil
-      | false
-      | true
-      | Number
-      | String
-      | `...´
-      | function
-      | prefixexp
-      | tableconstructor
-      | exp binop exp
-      | unop exp .
+	var ::=  Name | prefixexp "[" exp "]" | prefixexp "." Name
 
-prefixexp ::= var
-            | functioncall
-            | `(´ exp `)´ .
+	namelist ::= Name {"," Name}
 
-functioncall ::= prefixexp args
-               | prefixexp `:´ Name args .
+	explist ::= exp {"," exp}
 
-args ::= `(´ [explist1] `)´
-       | tableconstructor
-       | String .
+	exp ::=  nil | false | true | Numeral | LiteralString | "..." | functiondef |
+		 prefixexp | tableconstructor | exp binop exp | unop exp
 
-function ::= function funcbody .
+	prefixexp ::= var | functioncall | "(" exp ")"
 
-funcbody ::= `(´ [parlist1] `)´ block end .
+	functioncall ::=  prefixexp args | prefixexp ":" Name args
 
-parlist1 ::= namelist [`,´ `...´]
-           |  `...´ .
+	args ::=  "(" [explist] ")" | tableconstructor | LiteralString
 
-tableconstructor ::= `{´ [fieldlist] `}´ .
+	functiondef ::= function funcbody
 
-fieldlist ::= field {fieldsep field} [fieldsep] .
+	funcbody ::= "(" [parlist] ")" block end
 
-field ::= `[´ exp `]´ `=´ exp
-        | Name `=´ exp
-        | exp .
+	parlist ::= namelist ["," "..."] | "..."
 
-fieldsep ::= `,´
-           | `;´ .
+	tableconstructor ::= "{" [fieldlist] "}"
 
-binop ::= `+´
-        | `-´
-        | `*´
-        | `/´
-        | `^´
-        | `%´
-        | `<´
-        | `>´
-        | `..´
-        | `<=´
-        | `>=´
-        | `==´
-        | `~=´
-        | and
-        | or .
+	fieldlist ::= field {fieldsep field} [fieldsep]
 
-unop ::= `-´
-       | not
-       | `#´ .
+	field ::= "[" exp "]" "=" exp | Name "=" exp | exp
+
+	fieldsep ::= "," | ";"
+
+	binop ::=  "+" | "-" | "*" | "/" | "//" | "^" | "%" |
+		 "&" | "~" | "|" | ">>" | "<<" | ".." |
+		 "<" | "<=" | ">" | ">=" | "==" | "~=" |
+		 and | or
+
+	unop ::= "-" | not | "#" | "~"
+
+;; last update: tue may 2 20:09:38 utc 2023
