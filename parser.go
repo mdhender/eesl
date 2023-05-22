@@ -20,3 +20,33 @@
 // SOFTWARE.
 
 package eesl
+
+func or(args ...func() bool) bool {
+	for _, arg := range args {
+		if arg() {
+			return true
+		}
+	}
+	return false
+}
+
+func sequence(args ...func() bool) bool {
+	for _, arg := range args {
+		if !arg() {
+			return false
+		}
+	}
+	return true
+}
+
+func zeroOrMore(args ...any) func() bool {
+	return func() bool {
+		return true
+	}
+}
+
+func zeroOrOne(args ...any) func() bool {
+	return func() bool {
+		return true
+	}
+}
