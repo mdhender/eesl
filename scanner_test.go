@@ -42,7 +42,7 @@ func TestScanner(t *testing.T) {
 		print(fact(a))
 	`)
 
-	for _, token := range eesl.Scan(input) {
+	for _, token := range eesl.Scan(input, false, false) {
 		t.Logf("%3d: %-30q %v\n", token.Line, string(token.Text), token.Error)
 	}
 
@@ -59,7 +59,7 @@ func TestScanner(t *testing.T) {
 		end
 	`)
 
-	for _, token := range eesl.Scan(input) {
+	for _, token := range eesl.Scan(input, true, true) {
 		t.Logf("%3d: %-30q %v\n", token.Line, string(token.Text), token.Error)
 	}
 
@@ -73,7 +73,7 @@ func TestScanner(t *testing.T) {
 		--]]
 	`)
 
-	for _, token := range eesl.Scan(input) {
+	for _, token := range eesl.Scan(input, true, true) {
 		t.Logf("%3d: %-30q %v\n", token.Line, string(token.Text), token.Error)
 	}
 
@@ -90,7 +90,7 @@ func TestScanner(t *testing.T) {
 		print(type(a))              --> number
 	`)
 
-	for _, token := range eesl.Scan(input) {
+	for _, token := range eesl.Scan(input, true, true) {
 		t.Logf("%3d: %-30q %v\n", token.Line, string(token.Text), token.Error)
 	}
 
@@ -100,7 +100,7 @@ func TestScanner(t *testing.T) {
 		print("a simpler way: '\\'")
 	`)
 
-	for _, token := range eesl.Scan(input) {
+	for _, token := range eesl.Scan(input, true, true) {
 		t.Logf("%3d: %-30q %v\n", token.Line, string(token.Text), token.Error)
 	}
 
@@ -134,8 +134,22 @@ func TestScanner(t *testing.T) {
 			{1, ")"},
 			{1, ")"},
 		}},
+		{6, `b = string.gsub(a, "one", "another")`, []expect{
+			{1, "b"},
+			{1, "="},
+			{1, "string"},
+			{1, "."},
+			{1, "gsub"},
+			{1, "("},
+			{1, "a"},
+			{1, ","},
+			{1, `"one"`},
+			{1, ","},
+			{1, `"another"`},
+			{1, ")"},
+		}},
 	} {
-		tokens := eesl.Scan([]byte(tc.input))
+		tokens := eesl.Scan([]byte(tc.input), true, true)
 		if len(tokens) != len(tc.expect) {
 			t.Errorf("%d: want tokens: %d, got %d\n", tc.id, len(tc.expect), len(tokens))
 		} else {

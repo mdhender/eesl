@@ -37,7 +37,7 @@ type Token struct {
 // Scan returns all the tokens in the input buffer.
 // Errors such as unterminated blocks are included in the token.
 // Nil is returned only if the input buffer is empty.
-func Scan(buffer []byte) []Token {
+func Scan(buffer []byte, ignoreSpaces, ignoreComments bool) []Token {
 	var delims = []byte{'+', '-', '*', '/', '%', '^', '#', ',', '=', '<', '>', '(', ')', '[', ']', '{', '}', '.', ':', ';'}
 
 	line, tokens := 1, []Token{}
@@ -48,7 +48,9 @@ func Scan(buffer []byte) []Token {
 		case '\n':
 			t.Text, buffer = []byte{ch}, buffer[1:]
 			line++
-			tokens = append(tokens, t)
+			if !ignoreSpaces {
+				tokens = append(tokens, t)
+			}
 			continue
 		case '+', '*', '/', '%', '^', '#', ',', '(', ')', '[', ']', '{', '}', ':', ';':
 			t.Text, buffer = []byte{ch}, buffer[1:]
@@ -57,6 +59,7 @@ func Scan(buffer []byte) []Token {
 		case '-':
 			if len(buffer) == 0 || buffer[0] != '-' {
 				t.Text, buffer = []byte{'-'}, buffer[1:]
+				tokens = append(tokens, t)
 			} else if bytes.HasPrefix(buffer, []byte{'-', '-', '[', '['}) { // found block comment
 				eoc := bytes.Index(buffer, []byte{'-', '-', ']', ']'})
 				if eoc == -1 {
@@ -67,14 +70,19 @@ func Scan(buffer []byte) []Token {
 					t.Text, buffer = buffer[:eoc+4], buffer[eoc+4:]
 				}
 				line += bytes.Count(t.Text, []byte{'\n'})
+				if !ignoreComments {
+					tokens = append(tokens, t)
+				}
 			} else { // found comment!
 				start, length := buffer, 0
 				for len(buffer) != 0 && buffer[0] != '\n' {
 					buffer, length = buffer[1:], length+1
 				}
 				t.Text = start[:length]
+				if !ignoreComments {
+					tokens = append(tokens, t)
+				}
 			}
-			tokens = append(tokens, t)
 			continue
 		case '<', '>', '=', '~':
 			t.Text, buffer = []byte{ch}, buffer[1:]
@@ -107,7 +115,9 @@ func Scan(buffer []byte) []Token {
 				r, w = utf8.DecodeRune(buffer)
 			}
 			t.Text = start[:length]
-			tokens = append(tokens, t)
+			if !ignoreSpaces {
+				tokens = append(tokens, t)
+			}
 			continue
 		}
 
