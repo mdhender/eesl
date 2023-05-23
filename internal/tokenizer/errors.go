@@ -19,17 +19,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package eesl
+package tokenizer
 
-import (
-	"github.com/mdhender/eesl/internal/builder"
-	"github.com/mdhender/eesl/internal/tokenizer"
+import "github.com/maloquacious/cerrors"
+
+const (
+	ErrUnterminated = cerrors.Error("unterminated")
 )
-
-func Parse(tokens []tokenizer.Token) (parseTree *builder.Tree, debugTree *builder.DebugTree, err error) {
-	b := builder.NewBuilder(tokens)
-	if ok := ntChunk(b); !ok {
-		return nil, b.DebugTree(), b.Err()
-	}
-	return b.ParseTree(), b.DebugTree(), nil
-}

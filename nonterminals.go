@@ -21,204 +21,577 @@
 
 package eesl
 
-func chunk(tokens []Token) bool {
-	return block(tokens)
+import (
+	"github.com/mdhender/eesl/internal/builder"
+	"github.com/mdhender/eesl/internal/tokenizer"
+)
+
+func ntChunk(b *builder.Builder) (ok bool) {
+	b.Enter("chunk")
+	defer b.Exit(&ok)
+
+	return ntBlock(b)
 }
 
-func block(tokens []Token) bool {
-	return sequence(zeroOrMore(stat), zeroOrOne(retstat))
+func ntBlock(b *builder.Builder) (ok bool) {
+	b.Enter("block")
+	defer b.Exit(&ok)
+
+	for ntStat(b) {
+		// ... //
+	}
+	if ntRetstat(b) {
+		// ... //
+	}
+	return true
 }
 
-func stat(tokens []Token) bool {
-	if SemiColon(tokens) {
+func ntStat(b *builder.Builder) (ok bool) {
+	b.Enter("stat")
+	defer b.Exit(&ok)
+
+	if b.Match(tokenizer.SemiColon) {
+		// ... //
 		return true
 	}
-	if sequence(varlist, Equals, explist) {
+	if ntVarlist(b) && b.Match(tokenizer.Equals) && ntExplist(b) {
+		// ... //
 		return true
 	}
-	if functioncall(tokens) {
+	if ntFunctioncall(b) {
+		// ... //
 		return true
 	}
-	if label(tokens) {
+	if ntLabel(b) {
+		// ... //
 		return true
 	}
-	if Break(tokens) {
+	if b.Match(tokenizer.Break) {
+		// ... //
 		return true
 	}
-	if sequence(Goto, Name) {
+	if b.Match(tokenizer.Goto) && b.Match(tokenizer.Name) {
+		// ... //
 		return true
 	}
-	if sequence(Do, block, End) {
+	if b.Match(tokenizer.Do) && ntBlock(b) && b.Match(tokenizer.End) {
+		// ... //
 		return true
 	}
-	if sequence(While, exp, Do, block, End) {
+	if b.Match(tokenizer.While) && ntExp(b) && b.Match(tokenizer.Do) && ntBlock(b) && b.Match(tokenizer.End) {
+		// ... //
 		return true
 	}
-	if sequence(Repeat, block, Until, exp) {
+	if b.Match(tokenizer.Repeat) && ntBlock(b) && b.Match(tokenizer.Until) && ntExp(b) {
+		// ... //
 		return true
 	}
-	if sequence(If, exp, Then, block, zeroOrMore(ElseIf, exp, Then, block), zeroOrOne(Else, block), End) {
+	if b.Match(tokenizer.If) && ntExp(b) && b.Match(tokenizer.Then) && ntBlock(b) {
+		for b.Match(tokenizer.ElseIf) && ntExp(b) && b.Match(tokenizer.Then) && ntBlock(b) {
+			// ... //
+		}
+		if b.Match(tokenizer.Else) && ntBlock(b) {
+			// ... //
+		}
+		if b.Match(tokenizer.End) {
+			// ... //
+			return true
+		}
+		return false
+	}
+	if b.Match(tokenizer.For) && b.Match(tokenizer.Name) && b.Match(tokenizer.Equals) && ntExp(b) && b.Match(tokenizer.Comma) && ntExp(b) {
+		if b.Match(tokenizer.Comma) && ntExp(b) {
+			// ... //
+		}
+		if b.Match(tokenizer.Do) && ntBlock(b) && b.Match(tokenizer.End) {
+			// ... //
+			return true
+		}
+		return false
+	}
+	if b.Match(tokenizer.For) && ntNamelist(b) && b.Match(tokenizer.In) && ntExplist(b) && b.Match(tokenizer.Do) && ntBlock(b) && b.Match(tokenizer.End) {
+		// ... //
 		return true
 	}
-	if sequence(For, Name, Equals, exp, Comma, exp, zeroOrOne(Comma, exp), Do, block, End) {
+	if b.Match(tokenizer.Function) && ntFuncname(b) && ntFuncbody(b) {
+		// ... //
 		return true
 	}
-	if sequence(For, namelist, In, explist, Do, block, End) {
+	if b.Match(tokenizer.Local) && b.Match(tokenizer.Function) && b.Match(tokenizer.Name) && ntFuncbody(b) {
+		// ... //
 		return true
 	}
-	if sequence(Function, funcname, funcbody) {
+	if b.Match(tokenizer.Local) && ntAttnamelist(b) {
+		// ... //
+		if b.Match(tokenizer.Equals) && ntExplist(b) {
+			// ... //
+		}
 		return true
 	}
-	if sequence(Local, Function, Name, funcbody) {
-		return true
-	}
-	return sequence(Local, attnamelist, zeroOrOne(Equals, explist))
+	return false
 }
 
-func attnamelist(tokens []Token) bool {
-	return sequence(Name, attrib, zeroOrOne(Comma, Name, attrib))
+func ntAttnamelist(b *builder.Builder) (ok bool) {
+	b.Enter("attnamelist")
+	defer b.Exit(&ok)
+
+	if b.Match(tokenizer.Name) && ntAttrib(b) {
+		// ... //
+		for b.Match(tokenizer.Comma) && b.Match(tokenizer.Name) && ntAttrib(b) {
+			// ... //
+		}
+	}
+	return false
 }
 
-func attrib(tokens []Token) bool {
-	return zeroOrOne(LessThan, Name, GreaterThan)(tokens)
-}
+func ntAttrib(b *builder.Builder) (ok bool) {
+	b.Enter("attrib")
+	defer b.Exit(&ok)
 
-func retstat(tokens []Token) bool {
-	return sequence(Return, zeroOrOne(explist), zeroOrOne(SemiColon))
-}
-
-func label(tokens []Token) bool {
-	return sequence(ColonColon, Name, ColonColon)
-}
-
-func funcname(tokens []Token) bool {
-	return sequence(Name, zeroOrMore(Dot, Name), zeroOrOne(Colon, Name))
-}
-
-func varlist(tokens []Token) bool {
-	return sequence(variable, zeroOrMore(Comma, variable))
-}
-
-func variable(tokens []Token) bool {
-	if Name(tokens) {
+	if b.Match(tokenizer.LessThan) && b.Match(tokenizer.Name) && b.Match(tokenizer.GreaterThan) {
+		// ... //
 		return true
 	}
-	if sequence(prefixexp, OpenBracket, exp, CloseBracket) {
-		return true
-	}
-	return sequence(prefixexp, Dot, Name)
+	// epsilon
+	return true
 }
 
-func namelist(tokens []Token) bool {
-	return sequence(Name, zeroOrMore(Comma, Name))
+func ntRetstat(b *builder.Builder) (ok bool) {
+	b.Enter("retstat")
+	defer b.Exit(&ok)
+
+	if b.Match(tokenizer.Return) {
+		// ... //
+		if ntExplist(b) {
+			// ... //
+		}
+		if b.Match(tokenizer.SemiColon) {
+			// ... //
+		}
+		return true
+	}
+	return false
 }
 
-func explist(tokens []Token) bool {
-	return sequence(exp, zeroOrMore(Comma, Name))
+func ntLabel(b *builder.Builder) (ok bool) {
+	b.Enter("label")
+	defer b.Exit(&ok)
+
+	if b.Match(tokenizer.ColonColon) && b.Match(tokenizer.Name) && b.Match(tokenizer.ColonColon) {
+		// ... //
+		return true
+	}
+	return false
 }
 
-func exp(tokens []Token) bool {
-	if Nil(tokens) {
+func ntFuncname(b *builder.Builder) (ok bool) {
+	b.Enter("funcname")
+	defer b.Exit(&ok)
+
+	if b.Match(tokenizer.Name) {
+		// ... //
+		for b.Match(tokenizer.Dot) && b.Match(tokenizer.Name) {
+			// ... //
+		}
+		if b.Match(tokenizer.Colon) && b.Match(tokenizer.Name) {
+			// ... //
+		}
 		return true
 	}
-	if False(tokens) {
-		return true
-	}
-	if True(tokens) {
-		return true
-	}
-	if Numeral(tokens) {
-		return true
-	}
-	if LiteralString(tokens) {
-		return true
-	}
-	if DotDotDot(tokens) {
-		return true
-	}
-	if functiondef(tokens) {
-		return true
-	}
-	if prefixexp(tokens) {
-		return true
-	}
-	if tableconstructor(tokens) {
-		return true
-	}
-	if sequence(exp, binop, exp) {
-		return true
-	}
-	return sequence(unop, exp)
+	return false
 }
 
-func prefixexp(tokens []Token) bool {
-	if variable(tokens) {
+func ntVarlist(b *builder.Builder) (ok bool) {
+	b.Enter("varlist")
+	defer b.Exit(&ok)
+
+	if ntVar(b) {
+		// ... //
+		for b.Match(tokenizer.Comma) && ntVar(b) {
+			// ... //
+		}
 		return true
 	}
-	if functioncall(tokens) {
+	return false
+}
+
+func ntVar(b *builder.Builder) (ok bool) {
+	b.Enter("var")
+	defer b.Exit(&ok)
+
+	if b.Match(tokenizer.Name) {
+		// ... //
 		return true
 	}
-	return sequence(OpenParen, exp, CloseParen)
-}
-
-func functioncall(tokens []Token) bool {
-	if sequence(prefixexp, args) {
+	if ntPrefixexp(b) && b.Match(tokenizer.OpenBracket) && ntExp(b) && b.Match(tokenizer.CloseBracket) {
+		// ... //
 		return true
 	}
-	return sequence(prefixexp, Colon, Name, args)
-}
-
-func args(tokens []Token) bool {
-	if sequence(OpenParen, zeroOrOne(explist), CloseParen) {
+	if ntPrefixexp(b) && b.Match(tokenizer.Dot) && b.Match(tokenizer.Name) {
+		// ... //
 		return true
 	}
-	if tableconstructor(tokens) {
+	return false
+}
+
+func ntNamelist(b *builder.Builder) (ok bool) {
+	b.Enter("namelist")
+	defer b.Exit(&ok)
+
+	if b.Match(tokenizer.Name) {
+		// ... //
+		for b.Match(tokenizer.Comma) && b.Match(tokenizer.Name) {
+			// ... //
+		}
 		return true
 	}
-	return LiteralString(tokens)
+	return false
 }
 
-func functiondef(tokens []Token) bool {
-	return sequence(Function, funcbody)
-}
+func ntExplist(b *builder.Builder) (ok bool) {
+	b.Enter("explist")
+	defer b.Exit(&ok)
 
-func funcbody(tokens []Token) bool {
-	return sequence(OpenParen, zeroOrOne(parlist), CloseParen, block, End)
-}
-
-func parlist(tokens []Token) bool {
-	if sequence(namelist, zeroOrOne(Comma, DotDotDot)) {
+	if ntExp(b) {
+		// ... //
+		for b.Match(tokenizer.Comma) && b.Match(tokenizer.Name) {
+			// ... ///
+		}
 		return true
 	}
-	return DotDotDot(tokens)
+	return false
 }
 
-func tableconstructor(tokens []Token) bool {
-	return sequence(OpenCurly, zeroOrOne(fieldlist), CloseCurly)
-}
+func ntExp(b *builder.Builder) (ok bool) {
+	b.Enter("exp")
+	defer b.Exit(&ok)
 
-func fieldlist(tokens []Token) bool {
-	return sequence(field, zeroOrMore(fieldsep, field), zeroOrOne(fieldsep))
-}
-
-func field(tokens []Token) bool {
-	if sequence(OpenBracket, exp, CloseBracket, Equals, exp) {
+	if b.Match(tokenizer.Nil) {
+		// ... //
 		return true
 	}
-	if sequence(Name, Equals, exp) {
+	if b.Match(tokenizer.False) {
+		// ... //
 		return true
 	}
-	return exp(tokens)
+	if b.Match(tokenizer.True) {
+		// ... //
+		return true
+	}
+	if b.Match(tokenizer.Numeral) {
+		// ... //
+		return true
+	}
+	if b.Match(tokenizer.LiteralString) {
+		// ... //
+		return true
+	}
+	if b.Match(tokenizer.DotDotDot) {
+		// ... //
+		return true
+	}
+	if ntFunctiondef(b) {
+		// ... //
+		return true
+	}
+	if ntPrefixexp(b) {
+		// ... //
+		return true
+	}
+	if ntTableconstructor(b) {
+		// ... //
+		return true
+	}
+	if ntExp(b) && ntBinop(b) && ntExp(b) {
+		// ... //
+		return true
+	}
+	if ntUnop(b) && ntExp(b) {
+		// ... //
+		return true
+	}
+	return false
 }
 
-func fieldsep(tokens []Token) bool {
-	return or(Comma, SemiColon)
+func ntPrefixexp(b *builder.Builder) (ok bool) {
+	b.Enter("prefixexp")
+	defer b.Exit(&ok)
+
+	if ntVar(b) {
+		// ... //
+		return true
+	}
+	if ntFunctioncall(b) {
+		// ... //
+		return true
+	}
+	if b.Match(tokenizer.OpenParen) && ntExp(b) && b.Match(tokenizer.CloseParen) {
+		// ... //
+		return true
+	}
+	return false
 }
 
-func binop(tokens []Token) bool {
-	return or(Plus, Hyphen, Star, Slash, SlashSlash, Caret, Percent, Ampersand, Tilde, Bar, GreaterThanGreaterThan, LessThanLessThan, DotDot, LessThan, LessThanEquals, GreaterThan, GreaterThanEquals, EqualsEquals, TildeEquals, And, Or)
+func ntFunctioncall(b *builder.Builder) (ok bool) {
+	b.Enter("functioncall")
+	defer b.Exit(&ok)
+
+	if ntPrefixexp(b) && ntArgs(b) {
+		// ... //
+		return true
+	}
+	if ntPrefixexp(b) && b.Match(tokenizer.Colon) && b.Match(tokenizer.Name) && ntArgs(b) {
+		// ... //
+		return true
+	}
+	return false
 }
 
-func unop(tokens []Token) bool {
-	return or(Hyphen, Not, Hash, Tilde)
+func ntArgs(b *builder.Builder) (ok bool) {
+	b.Enter("args")
+	defer b.Exit(&ok)
+
+	if b.Match(tokenizer.OpenParen) {
+		// ... //
+		if ntExplist(b) {
+			// ... //
+		}
+		if b.Match(tokenizer.CloseParen) {
+			// ... //
+			return true
+		}
+		return false
+	}
+	if ntTableconstructor(b) {
+		// ... //
+		return true
+	}
+	if b.Match(tokenizer.LiteralString) {
+		// ... //
+		return true
+	}
+	return false
+}
+
+func ntFunctiondef(b *builder.Builder) (ok bool) {
+	b.Enter("functiondef")
+	defer b.Exit(&ok)
+
+	if b.Match(tokenizer.Function) && ntFuncbody(b) {
+		// ... //
+		return true
+	}
+	return false
+}
+
+func ntFuncbody(b *builder.Builder) (ok bool) {
+	b.Enter("funcbody")
+	defer b.Exit(&ok)
+
+	if b.Match(tokenizer.OpenParen) {
+		// ... //
+		if ntParlist(b) {
+			// ... //
+		}
+		if b.Match(tokenizer.CloseParen) && ntBlock(b) && b.Match(tokenizer.End) {
+			// ... //
+			return true
+		}
+		return false
+	}
+	return false
+}
+
+func ntParlist(b *builder.Builder) (ok bool) {
+	b.Enter("parlist")
+	defer b.Exit(&ok)
+
+	if ntNamelist(b) {
+		// ... //
+		if b.Match(tokenizer.Comma) && b.Match(tokenizer.DotDotDot) {
+			// ... //
+		}
+		return true
+	}
+	if b.Match(tokenizer.DotDotDot) {
+		// ... //
+		return true
+	}
+	return false
+}
+
+func ntTableconstructor(b *builder.Builder) (ok bool) {
+	b.Enter("tableconstructor")
+	defer b.Exit(&ok)
+
+	if b.Match(tokenizer.OpenCurly) && ntFieldlist(b) && b.Match(tokenizer.CloseCurly) {
+		// ... //
+		return true
+	}
+	return false
+}
+
+func ntFieldlist(b *builder.Builder) (ok bool) {
+	b.Enter("fieldlist")
+	defer b.Exit(&ok)
+
+	if ntField(b) {
+		// ... //
+		for ntFieldsep(b) && ntField(b) {
+			// ... //
+		}
+		if ntFieldsep(b) {
+			// ... //
+		}
+		return true
+	}
+	return false
+}
+
+func ntField(b *builder.Builder) (ok bool) {
+	b.Enter("field")
+	defer b.Exit(&ok)
+
+	if b.Match(tokenizer.OpenBracket) && ntExp(b) && b.Match(tokenizer.CloseBracket) && b.Match(tokenizer.Equals) && ntExp(b) {
+		// ... //
+		return true
+	}
+	if b.Match(tokenizer.Name) && b.Match(tokenizer.Equals) && ntExp(b) {
+		// ... //
+		return true
+	}
+	if ntExp(b) {
+		// ... //
+		return true
+	}
+	return false
+}
+
+func ntFieldsep(b *builder.Builder) (ok bool) {
+	b.Enter("fieldsep")
+	defer b.Exit(&ok)
+
+	if b.Match(tokenizer.Comma) {
+		// ... //
+		return true
+	}
+	if b.Match(tokenizer.SemiColon) {
+		// ... //
+		return true
+	}
+	return false
+}
+
+func ntBinop(b *builder.Builder) (ok bool) {
+	b.Enter("binop")
+	defer b.Exit(&ok)
+
+	if b.Match(tokenizer.Plus) {
+		// ... //
+		return true
+	}
+	if b.Match(tokenizer.Hyphen) {
+		// ... //
+		return true
+	}
+	if b.Match(tokenizer.Star) {
+		// ... //
+		return true
+	}
+	if b.Match(tokenizer.Slash) {
+		// ... //
+		return true
+	}
+	if b.Match(tokenizer.SlashSlash) {
+		// ... //
+		return true
+	}
+	if b.Match(tokenizer.Caret) {
+		// ... //
+		return true
+	}
+	if b.Match(tokenizer.Percent) {
+		// ... //
+		return true
+	}
+	if b.Match(tokenizer.Ampersand) {
+		// ... //
+		return true
+	}
+	if b.Match(tokenizer.Tilde) {
+		// ... //
+		return true
+	}
+	if b.Match(tokenizer.Bar) {
+		// ... //
+		return true
+	}
+	if b.Match(tokenizer.GreaterThanGreaterThan) {
+		// ... //
+		return true
+	}
+	if b.Match(tokenizer.LessThanLessThan) {
+		// ... //
+		return true
+	}
+	if b.Match(tokenizer.DotDot) {
+		// ... //
+		return true
+	}
+	if b.Match(tokenizer.LessThan) {
+		// ... //
+		return true
+	}
+	if b.Match(tokenizer.LessThanEquals) {
+		// ... //
+		return true
+	}
+	if b.Match(tokenizer.GreaterThan) {
+		// ... //
+		return true
+	}
+	if b.Match(tokenizer.GreaterThanEquals) {
+		// ... //
+		return true
+	}
+	if b.Match(tokenizer.EqualsEquals) {
+		// ... //
+		return true
+	}
+	if b.Match(tokenizer.TildeEquals) {
+		// ... //
+		return true
+	}
+	if b.Match(tokenizer.And) {
+		// ... //
+		return true
+	}
+	if b.Match(tokenizer.Or) {
+		// ... //
+		return true
+	}
+	return false
+}
+
+func ntUnop(b *builder.Builder) (ok bool) {
+	b.Enter("unop")
+	defer b.Exit(&ok)
+
+	if b.Match(tokenizer.Hyphen) {
+		// ... //
+		return true
+	}
+	if b.Match(tokenizer.Not) {
+		// ... //
+		return true
+	}
+	if b.Match(tokenizer.Hash) {
+		// ... //
+		return true
+	}
+	if b.Match(tokenizer.Tilde) {
+		// ... //
+		return true
+	}
+	return false
 }

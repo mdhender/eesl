@@ -1,5 +1,5 @@
 // eesl - embeddable, extendable scripting language
-// Copyright (c) 2023 Michael D Henderson
+// Copyright (c) 2018-2023 Michael D Henderson
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,10 +19,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package eesl
+package builder
 
-import "github.com/maloquacious/cerrors"
-
-const (
-	ErrUnterminated = cerrors.Error("unterminated")
-)
+type ele struct {
+	index   int
+	nonTerm *Tree
+}

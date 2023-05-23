@@ -19,17 +19,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package eesl
+package lexemes
 
-import (
-	"github.com/mdhender/eesl/internal/builder"
-	"github.com/mdhender/eesl/internal/tokenizer"
-)
-
-func Parse(tokens []tokenizer.Token) (parseTree *builder.Tree, debugTree *builder.DebugTree, err error) {
-	b := builder.NewBuilder(tokens)
-	if ok := ntChunk(b); !ok {
-		return nil, b.DebugTree(), b.Err()
-	}
-	return b.ParseTree(), b.DebugTree(), nil
+// Lexeme represents a lexeme received after scanning.
+type Lexeme struct {
+	Line  int
+	Kind  string
+	Text  []byte
+	Error error
 }

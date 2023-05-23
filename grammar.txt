@@ -10,21 +10,22 @@
 
 	block ::= {stat} [retstat]
 
-	stat ::=  ";" |
-		 varlist "=" explist |
-		 functioncall |
-		 label |
-		 break |
-		 goto Name |
-		 do block end |
-		 while exp do block end |
-		 repeat block until exp |
-		 if exp then block {elseif exp then block} [else block] end |
-		 for Name "=" exp "," exp ["," exp] do block end |
-		 for namelist in explist do block end |
-		 function funcname funcbody |
-		 local function Name funcbody |
-		 local attnamelist ["=" explist]
+	stat ::=
+	    ";" |
+        varlist "=" explist |
+        functioncall |
+        label |
+        break |
+        goto Name |
+        do block end |
+        while exp do block end |
+        repeat block until exp |
+        if exp then block {elseif exp then block} [else block] end |
+        for Name "=" exp "," exp ["," exp] do block end |
+        for namelist in explist do block end |
+        function funcname funcbody |
+        local function Name funcbody |
+        local attnamelist ["=" explist]
 
 	attnamelist ::=  Name attrib {"," Name attrib}
 
@@ -36,20 +37,27 @@
 
 	funcname ::= Name {"." Name} [":" Name]
 
-	varlist ::= variable {"," variable}
+	varlist ::= var {"," var}
 
-	variable ::=  Name | prefixexp "[" exp "]" | prefixexp "." Name
+	var ::=
+	    Name |
+	    prefixexp "[" exp "]" |
+	    prefixexp "." Name
 
 	namelist ::= Name {"," Name}
 
 	explist ::= exp {"," exp}
 
-	exp ::=  nil | false | true | Numeral | LiteralString | "..." | functiondef |
-		 prefixexp | tableconstructor | exp binop exp | unop exp
+	exp ::=
+	    nil | false | true | Numeral | LiteralString | "..." | functiondef |
+	    prefixexp |
+	    tableconstructor | exp binop exp | unop exp
 
-	prefixexp ::= variable | functioncall | "(" exp ")"
+	prefixexp ::= var | functioncall | "(" exp ")"
 
-	functioncall ::=  prefixexp args | prefixexp ":" Name args
+	functioncall ::=
+	    prefixexp args |
+	    prefixexp ":" Name args
 
 	args ::=  "(" [explist] ")" | tableconstructor | LiteralString
 

@@ -19,17 +19,67 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package eesl
+package tokenizer
 
-import (
-	"github.com/mdhender/eesl/internal/builder"
-	"github.com/mdhender/eesl/internal/tokenizer"
+type Kind int
+
+const (
+	Ampersand Kind = iota
+	And
+	Bar
+	Break
+	Caret
+	CloseBracket
+	CloseCurly
+	CloseParen
+	Colon
+	ColonColon
+	Comma
+	Do
+	Dot
+	DotDot
+	DotDotDot
+	Else
+	ElseIf
+	End
+	Equals
+	EqualsEquals
+	False
+	For
+	Function
+	Goto
+	GreaterThan
+	GreaterThanEquals
+	GreaterThanGreaterThan
+	Hash
+	Hyphen
+	If
+	In
+	LessThan
+	LessThanEquals
+	LessThanLessThan
+	LiteralString
+	Local
+	Name
+	Nil
+	Not
+	Numeral
+	OpenBracket
+	OpenCurly
+	OpenParen
+	Or
+	Percent
+	Plus
+	Repeat
+	Return
+	SemiColon
+	Slash
+	SlashSlash
+	Star
+	Then
+	Tilde
+	TildeEquals
+	True
+	Until
+	While
 )
-
-func Parse(tokens []tokenizer.Token) (parseTree *builder.Tree, debugTree *builder.DebugTree, err error) {
-	b := builder.NewBuilder(tokens)
-	if ok := ntChunk(b); !ok {
-		return nil, b.DebugTree(), b.Err()
-	}
-	return b.ParseTree(), b.DebugTree(), nil
-}

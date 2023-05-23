@@ -19,17 +19,34 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package eesl
+package main
 
 import (
-	"github.com/mdhender/eesl/internal/builder"
+	"fmt"
+	"github.com/mdhender/eesl"
 	"github.com/mdhender/eesl/internal/tokenizer"
+	"os"
 )
 
-func Parse(tokens []tokenizer.Token) (parseTree *builder.Tree, debugTree *builder.DebugTree, err error) {
-	b := builder.NewBuilder(tokens)
-	if ok := ntChunk(b); !ok {
-		return nil, b.DebugTree(), b.Err()
+func main() {
+	code, err := os.ReadFile("sample.lua")
+	if err != nil {
+		printExit("could not open file: %v\n", err)
 	}
-	return b.ParseTree(), b.DebugTree(), nil
+
+	tokens := tokenizer.Scan(code, true, true)
+	fmt.Println("Tokens:", tokens)
+
+	parseTree, debugTree, err := eesl.Parse(tokens)
+	if err != nil {
+		fmt.Print("Debug Tree:\n\n", debugTree)
+		printExit("parsing failed: %v\n", err)
+	}
+
+	fmt.Print("Parse Tree:\n\n", parseTree)
+}
+
+func printExit(format string, args ...any) {
+	_, _ = fmt.Fprintf(os.Stderr, format, args...)
+	os.Exit(1)
 }
